@@ -3,12 +3,15 @@ extern crate piston;
 extern crate graphics;
 extern crate glutin_window;
 extern crate opengl_graphics;
-
 use piston::window::WindowSettings;
 use piston::event::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
-
+use piston::input::Button::{ Keyboard, Mouse };
+use piston::input::Input::{ Move, Press };
+use piston::input::keyboard::Key;
+use piston::input::InputEvent::*;
+use piston::input::Motion::MouseRelative;
 pub struct App {
     gl: GlGraphics,
     rotation: f64,
@@ -18,26 +21,41 @@ pub struct App {
 impl App {
      fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
-        
+
+        // Color Constants  
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         const BLUE: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
         const BLACK: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+        const WHITE: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
+
+        // Create the square
         let square = rectangle::square(0.0, 0.0, 50.0);
         let rotation = self.rotation;
         let body_count = self.body_count;
         let (x, y) = ((args.width/2) as f64, (args.height/2) as f64);
 
         self.gl.draw(args.viewport(), |c, gl| {
-            clear(GREEN, gl);
+            clear(BLACK, gl);
 
             let transform = c.transform.trans(x, y).rot_rad(rotation).trans(-25.0,-25.0);
 
-            rectangle(RED, square, transform, gl);
+            rectangle(WHITE, square, transform, gl);
         });
      }
     fn update(&mut self, args: &UpdateArgs){
+
+        // Insert gravity code here
         self.rotation += 2.0 * args.dt;
+
+    }
+
+    fn handleInput (&mut self, i : InputEvent) {
+        match i {
+            _=> { println!("input");}
+
+
+        }
 
     }
 
@@ -58,8 +76,8 @@ fn setup_graphics() {
     let window = Window::new(
         opengl,
         WindowSettings::new(
-            "spinning-square",
-            [200,200]
+            "N-body Gravity Simulation by Wilson Zhao",
+            [500,500]
         )
         .exit_on_esc(true)
     );
@@ -74,15 +92,26 @@ fn setup_graphics() {
     };
 
     for e in window.events() {
-        if let Some(r) = e.render_args() {
-            app.render(&r);
-        }
-        
-        if let Some(u) = e.update_args() {
-            app.update(&u);
-        }
-    }
-    
+        match e {
+            
+            Event::Input(i) => {
+                app.handleInput(i.clone());
 
+            }
+
+            Event::Render(_) => {
+                if let Some(r) = e.render_args() {
+                    app.render(&r);
+                }
+            }
+
+            Event::Update(_) => {
+                if let Some(u) = e.update_args() {
+                    app.update(&u);
+                }
+            }
+            _ => {}
+        } 
+    }
 }
     
