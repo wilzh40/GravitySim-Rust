@@ -8,9 +8,8 @@ use piston::event::*;
 use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{ GlGraphics, OpenGL };
 use piston::input::Button::{ Keyboard, Mouse };
-use piston::input::Input::{ Move, Press };
+use piston::input::Input;
 use piston::input::keyboard::Key;
-use piston::input::InputEvent::*;
 use piston::input::Motion::MouseRelative;
 pub struct App {
     gl: GlGraphics,
@@ -50,7 +49,7 @@ impl App {
 
     }
 
-    fn handleInput (&mut self, i : InputEvent) {
+    fn handleInput (&mut self, i:Input ) {
         match i {
             _=> { println!("input");}
 
