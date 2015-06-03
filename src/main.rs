@@ -50,8 +50,18 @@ impl App {
     }
 
     fn handleInput (&mut self, i:Input ) {
+        
         match i {
+            Input::Release(Mouse(Left)) => { 
+                println!("Button Released");
+                if let Some(args) = i.mouse_cursor_args(){
+                    println!("{:?}",args);
+                }
+            
+            
+            },
             _=> { println!("input");}
+            
 
 
         }
@@ -76,7 +86,7 @@ fn setup_graphics() {
         opengl,
         WindowSettings::new(
             "N-body Gravity Simulation by Wilson Zhao",
-            [500,500]
+            [800,800]
         )
         .exit_on_esc(true)
     );
