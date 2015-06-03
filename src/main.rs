@@ -10,11 +10,49 @@ use opengl_graphics::{ GlGraphics, OpenGL };
 use piston::input::Button::{ Keyboard, Mouse };
 use piston::input::Input;
 use piston::input::keyboard::Key;
-use piston::input::Motion::MouseRelative;
+use piston::input::Motion::MouseCursor;
+
+pub struct Body {
+    position: (f64, f64),
+    velocity: (f64, f64),
+    acceleration: (f64, f64),
+
+    radius: f64,
+    density: f32,
+    
+    color: (f32, f32, f32, f32),
+
+}
+
+impl Body {
+    fn new(position: (f64, f64), radius: f64, density: f32) -> Body {
+       Body {
+           position: position,
+           velocity: (0.0, 0.0),
+           acceleration: (0.0, 0.0),
+
+           radius: radius,
+           density: density,
+
+           color: (1.0, 1.0, 1.0, 1.0),
+
+
+       }
+
+
+    }
+
+
+
+
+}
+
 pub struct App {
     gl: GlGraphics,
     rotation: f64,
     body_count: i32,
+    current_cursor_position: (f64, f64),
+    bodies: Vec<Body>
 }
 
 impl App {
@@ -55,11 +93,17 @@ impl App {
             Input::Release(Mouse(Left)) => { 
                 println!("Button Released");
                 if let Some(args) = i.mouse_cursor_args(){
-                    println!("{:?}",args);
                 }
-            
+             
+                 println!("{:?}",i.mouse_cursor_args());
             
             },
+
+            Input::Move(MouseCursor(x, y)) => {
+                println!("({},{})", x, y);
+            }
+
+
             _=> { println!("input");}
             
 
@@ -96,7 +140,9 @@ fn setup_graphics() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         rotation: 0.0,
-        body_count: 1
+        body_count: 1,
+        current_cursor_position: (0.0,0.0),
+        bodies: Vec::new(),
 
     };
 
