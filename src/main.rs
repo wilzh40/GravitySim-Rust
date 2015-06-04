@@ -15,6 +15,9 @@ use piston::input::Motion::MouseCursor;
 const windowX: f64 = 800.0;
 const windowY: f64 = 800.0;
 const windowSize: [f32; 2] = [800.0, 800.0];
+
+
+#[derive(Clone)]
 pub struct Body {
     position: (f64, f64),
     velocity: (f64, f64),
@@ -26,7 +29,6 @@ pub struct Body {
     color: (f32, f32, f32, f32),
 
 }
-
 impl Body {
     fn new(position: (f64, f64), radius: f64, density: f64) -> Body {
        Body {
@@ -103,15 +105,17 @@ impl App {
         // ma = G * m1 * m2 / r^2
         // a = G * m1 * m2 / r^2 / m1
         // m = pi * r^2 * density
-        const G: f64  = 6.67384 * 1e-11;
-        for a in &mut self.bodies {
+        // const G: f64  = 6.67384 * 1e-11;
+        let G : f64 = 100.0;
+        for a in self.bodies.clone(){
 
             let r1 = a.radius as f64;
             let area = consts::PI * (r1 * r1);
             let m1  = area * a.density;
-
-            for b in &self.bodies.clone() {
-
+            
+            
+            for b in &mut self.bodies{
+                if a.position == b.position { continue; }
                 let r2 = b.radius as f64;
                 let area = consts::PI * (r2 * r2);
                 let m2  = area * a.density;
@@ -120,23 +124,13 @@ impl App {
                 let displacement = (b.position.0 - a.position.0, b.position.1 - a.position.1);
                 let distance = (displacement.0.powf(2.0) + displacement.1.powf(2.0)).powf(0.5);
                 
-
-
-            
-                let accel_magnitude = G * m2 / distance / distance;
+                let accel_magnitude = G * m1 / distance / distance;
 
                 println!("AM:{}", accel_magnitude);
 
-
             }
-            
-
-
 
         }
-
-
-
     }
 
     fn handleInput (&mut self, i:Input ) {
