@@ -107,10 +107,10 @@ impl App {
         // ma = G * m1 * m2 / r^2
         // a = G * m1 * m2 / r^2 / m1
         // m = pi * r^2 * density
-        // const G: f64  = 6.67384 * 1e-11;
+        //const G: f64  = 6.67384 * 1e-11;
         let clone = self.bodies.clone();
         
-        let G : f64 = 100.0;
+        let G : f64 = 1e-2;
         for a in &mut self.bodies{
 
             let r1 = a.radius as f64;
@@ -139,8 +139,16 @@ impl App {
             }
             
             println!(" AV: {:?}",  total_acceleration);
+            a.acceleration = total_acceleration;
 
         }
+        
+       // Velocity 
+        for a in &mut self.bodies{
+            a.velocity = (a.velocity.0 + a.acceleration.0, a.velocity.1 + a.acceleration.1);
+            a.position = (a.position.0 + a.velocity.0, a.position.1 + a.velocity.1);
+        }
+ 
     }
 
     fn handleInput (&mut self, i:Input ) {
