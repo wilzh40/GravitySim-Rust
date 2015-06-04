@@ -28,9 +28,11 @@ pub struct Body {
     
     color: (f32, f32, f32, f32),
 
+    id: i64
+
 }
 impl Body {
-    fn new(position: (f64, f64), radius: f64, density: f64) -> Body {
+    fn new(position: (f64, f64), radius: f64, density: f64, id: i64) -> Body {
        Body {
            position: position,
            velocity: (0.0, 0.0),
@@ -41,6 +43,8 @@ impl Body {
 
            color: (1.0, 1.0, 1.0, 1.0),
 
+           id: id,
+
        }
     }
 }
@@ -48,7 +52,7 @@ impl Body {
 pub struct App {
     gl: GlGraphics,
     rotation: f64,
-    body_count: i32,
+    id: i64,
     current_cursor_position: (f64, f64),
     bodies: Vec<Body>
 }
@@ -67,8 +71,6 @@ impl App {
         // Create the square
         let square = rectangle::square(0.0, 0.0, 50.0);
         let circle = rectangle::square(0.0, 0.0, 20.0);
-        let rotation = self.rotation;
-        let body_count = self.body_count;
         let (x, y) = ((args.width/2) as f64, (args.height/2) as f64);
         
         self.gl.draw(args.viewport(), |c, gl| {
@@ -82,7 +84,7 @@ impl App {
             self.gl.draw(args.viewport(), |c, gl| {
                 let circle = rectangle::square(b.position.0, b.position.1, b.radius);
 
-                let transform = c.transform.trans(x, y).rot_rad(rotation).trans(-25.0,-25.0);
+              //  let transform = c.transform.trans(x, y).rot_rad(rotation).trans(-25.0,-25.0);
                 
 //                rectangle(BLACK, square, transform, gl);
                 ellipse(BLACK, circle, c.transform, gl);                          
@@ -119,16 +121,17 @@ impl App {
             
             let mut total_acceleration = (0.0, 0.0);
             for b in clone.clone(){
-                if a.position == b.position { continue; }
+                if a.id == b.id { continue; }
                 let r2 = b.radius as f64;
                 let area = consts::PI * (r2 * r2);
                 let m2  = area * a.density;
 
-
+                let eps = 1.5e1; //dampening parameter to avoid infinites
                 let displacement = (b.position.0 - a.position.0, b.position.1 - a.position.1);
                 let angle = displacement.1.atan2(displacement.0);
                 let distance = (displacement.0.powf(2.0) + displacement.1.powf(2.0)).powf(0.5);
-                let accel_magnitude = G * m2 / distance / distance;
+                let accel_magnitude = G * m2 / (distance * distance + eps * eps) ; 
+                
                 let acceleration = (angle.cos() * accel_magnitude, angle.sin() * accel_magnitude);
 
                 total_acceleration = (total_acceleration.0 + acceleration.0, total_acceleration.1 +
@@ -163,7 +166,8 @@ impl App {
                 
                 // Adds a new body to the stage
 
-                let b: Body = Body::new(self.current_cursor_position, 10.0, 10.0);
+                let b: Body = Body::new(self.current_cursor_position, 10.0, 10.0, self.id);
+                self.id = self.id + 1;
                 self.bodies.push(b);
 
             },
@@ -209,7 +213,7 @@ fn setup_graphics() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         rotation: 0.0,
-        body_count: 1,
+        id: 0,
         current_cursor_position: (0.0,0.0),
         bodies: Vec::new(),
 
