@@ -21,14 +21,14 @@ pub struct Body {
     acceleration: (f64, f64),
 
     radius: f64,
-    density: f32,
+    density: f64,
     
     color: (f32, f32, f32, f32),
 
 }
 
 impl Body {
-    fn new(position: (f64, f64), radius: f64, density: f32) -> Body {
+    fn new(position: (f64, f64), radius: f64, density: f64) -> Body {
        Body {
            position: position,
            velocity: (0.0, 0.0),
@@ -96,9 +96,46 @@ impl App {
      
     
     fn update(&mut self, args: &UpdateArgs){
-
+        use std::num::*;
+        use std::f64::*;
         // Insert gravity code here
-        self.rotation += 2.0 * args.dt;
+        // Force = G * m1 * m2 / r^2
+        // ma = G * m1 * m2 / r^2
+        // a = G * m1 * m2 / r^2 / m1
+        // m = pi * r^2 * density
+        const G: f64  = 6.67384 * 1e-11;
+        for a in &mut self.bodies {
+
+            let r1 = a.radius as f64;
+            let area = consts::PI * (r1 * r1);
+            let m1  = area * a.density;
+
+            for b in &self.bodies.clone() {
+
+                let r2 = b.radius as f64;
+                let area = consts::PI * (r2 * r2);
+                let m2  = area * a.density;
+
+
+                let displacement = (b.position.0 - a.position.0, b.position.1 - a.position.1);
+                let distance = (displacement.0.powf(2.0) + displacement.1.powf(2.0)).powf(0.5);
+                
+
+
+            
+                let accel_magnitude = G * m2 / distance / distance;
+
+                println!("AM:{}", accel_magnitude);
+
+
+            }
+            
+
+
+
+        }
+
+
 
     }
 
