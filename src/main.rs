@@ -12,6 +12,9 @@ use piston::input::Input;
 use piston::input::keyboard::Key;
 use piston::input::Motion::MouseCursor;
 
+const windowX: f64 = 800.0;
+const windowY: f64 = 800.0;
+const windowSize: [f32; 2] = [800.0, 800.0];
 pub struct Body {
     position: (f64, f64),
     velocity: (f64, f64),
@@ -38,8 +41,6 @@ impl Body {
 
        }
     }
-
-
 }
 
 pub struct App {
@@ -67,22 +68,32 @@ impl App {
         let rotation = self.rotation;
         let body_count = self.body_count;
         let (x, y) = ((args.width/2) as f64, (args.height/2) as f64);
+        
+        self.gl.draw(args.viewport(), |c, gl| {
+            // Clear the scene after all bodies are drawn
+            clear(WHITE, gl);
+        });
+
         for b in &self.bodies {
+            // Iterate through all the bodies
+
             self.gl.draw(args.viewport(), |c, gl| {
-                clear(BLACK, gl);
+                let circle = rectangle::square(b.position.0, b.position.1, b.radius);
 
                 let transform = c.transform.trans(x, y).rot_rad(rotation).trans(-25.0,-25.0);
                 
-                rectangle(WHITE, square, transform, gl);
+//                rectangle(BLACK, square, transform, gl);
+                ellipse(BLACK, circle, c.transform, gl);                          
 
                // for b in self.bodies {
     //                let circle = rectangle::square(b.
                  //   ellipse(WHITE, circle, c.transform, gl); 
              //   }
             });
+         } 
         }
        
-     }
+     
     
     fn update(&mut self, args: &UpdateArgs){
 
@@ -109,6 +120,7 @@ impl App {
             },
 
             Input::Move(MouseCursor(x, y)) => {
+               // self.current_cursor_position = (x - windowX/2.0, y - windowY/2.0);
                 self.current_cursor_position = (x, y);
             }
 
