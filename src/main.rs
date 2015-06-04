@@ -117,9 +117,9 @@ impl App {
             let area = consts::PI * (r1 * r1);
             let m1  = area * a.density;
             
-                     
+            let mut total_acceleration = (0.0, 0.0);
             for b in clone.clone(){
-                if a.position == b.position { break; }
+                if a.position == b.position { continue; }
                 let r2 = b.radius as f64;
                 let area = consts::PI * (r2 * r2);
                 let m2  = area * a.density;
@@ -131,14 +131,14 @@ impl App {
                 let accel_magnitude = G * m2 / distance / distance;
                 let acceleration = (angle.cos() * accel_magnitude, angle.sin() * accel_magnitude);
 
-                a.acceleration = (a.acceleration.0 + acceleration.0, a.acceleration.1 +
+                total_acceleration = (total_acceleration.0 + acceleration.0, total_acceleration.1 +
                                   acceleration.1);
 
 
 
             }
             
-            println!(" AV: {:?}",  a.acceleration);
+            println!(" AV: {:?}",  total_acceleration);
 
         }
     }
