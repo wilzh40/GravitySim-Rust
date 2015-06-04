@@ -100,35 +100,45 @@ impl App {
     fn update(&mut self, args: &UpdateArgs){
         use std::num::*;
         use std::f64::*;
-        // Insert gravity code here
+
+        // Forces
+
         // Force = G * m1 * m2 / r^2
         // ma = G * m1 * m2 / r^2
         // a = G * m1 * m2 / r^2 / m1
         // m = pi * r^2 * density
         // const G: f64  = 6.67384 * 1e-11;
+        let clone = self.bodies.clone();
+        
         let G : f64 = 100.0;
-        for a in self.bodies.clone(){
+        for a in &mut self.bodies{
 
             let r1 = a.radius as f64;
             let area = consts::PI * (r1 * r1);
             let m1  = area * a.density;
             
-            
-            for b in &mut self.bodies{
-                if a.position == b.position { continue; }
+                     
+            for b in clone.clone(){
+                if a.position == b.position { break; }
                 let r2 = b.radius as f64;
                 let area = consts::PI * (r2 * r2);
                 let m2  = area * a.density;
 
 
                 let displacement = (b.position.0 - a.position.0, b.position.1 - a.position.1);
+                let angle = displacement.1.atan2(displacement.0);
                 let distance = (displacement.0.powf(2.0) + displacement.1.powf(2.0)).powf(0.5);
-                
-                let accel_magnitude = G * m1 / distance / distance;
+                let accel_magnitude = G * m2 / distance / distance;
+                let acceleration = (angle.cos() * accel_magnitude, angle.sin() * accel_magnitude);
 
-                println!("AM:{}", accel_magnitude);
+                a.acceleration = (a.acceleration.0 + acceleration.0, a.acceleration.1 +
+                                  acceleration.1);
+
+
 
             }
+            
+            println!(" AV: {:?}",  a.acceleration);
 
         }
     }
